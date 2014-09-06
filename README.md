@@ -1,6 +1,6 @@
 # TreeHouse
 
-![](http://www.mormonshare.com/sites/default/files/images/cg_clipart/cg_tree-house.jpg =250x250)
+<img src="./pic/cg_tree-house.jpg" alt="TreeHouse" width="250px" height="250px"/>
 
 ## Overview
 
