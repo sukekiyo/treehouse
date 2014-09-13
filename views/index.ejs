@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= name %></title>
+    <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="/javascripts/client.js"></script>
   </head>
   <body>
-    <h1>Hi, <%= name %></h1>
-    <p>Message <%= note %></p>
+    <h1><%= title %></h1>
+    <h4 id="cur_user"></h4>
+    <div id="message"></div>
+    <label for="msg">Message:</label>
+    <input type="text" name="FirstName" id="msg">
+    <button onclick="sendMessage()">Send</button>
   </body>
 </html>
