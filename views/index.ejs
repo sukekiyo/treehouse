@@ -3,6 +3,7 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" type="text/css" rel="stylesheet">
     <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
     <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
     <script src="/javascripts/client.js"></script>
@@ -10,7 +11,7 @@
   <body>
     <h1><%= title %></h1>
     <h4 id="cur_user"></h4>
-    <div id="message"></div>
+    <div id="message"><ul></div>
     <label for="msg">Message:</label>
     <input type="text" name="FirstName" id="msg">
     <button onclick="sendMessage()">Send</button>

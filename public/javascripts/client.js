@@ -12,9 +12,16 @@ socket.on('message', function (data) {
 });
 
 socket.on('history', function (data) {
+    var str = "<ul class='fa-ul'>";
     data.forEach(function(entry) {
-        $('#message').append('<p>' + entry.name + ": " + entry.message + '</p>');
+        str += '<li><i  class="fa-li fa fa-plus-circle"></i>' + entry.name + ": " + entry.message + '</li>';
+        str += "<ul><li><i  class='fa-li fa fa-plus-circle'></i>Response 1</li>" +
+            "<ul  class='fa-ul'><li>Response 1.1</li><li>Response 1.2</li><li>Response 1.3</li></ul>" +
+            "<li>Response 2</li></ul>";
     });
+    str += "</ul>";
+    $('#message').append(str);
+    register();
 });
 
 var sendMessage = function() {
@@ -40,3 +47,11 @@ $( document ).ready(function() {
 
     displayOldMessages();
 });
+
+var register = function() {
+    $('UL LI').click(function(){
+        if($(this).next().is("ul")) {
+            $(this).next().slideToggle();
+        }
+    });
+};
