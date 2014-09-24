@@ -15,8 +15,8 @@ socket.on('history', function (data) {
     var str = "<ul class='fa-ul'>";
     data.forEach(function(entry) {
         str += '<li><i  class="fa-li fa fa-plus-circle"></i>' + entry.name + ": " + entry.message + '</li>';
-        str += "<ul><li><i  class='fa-li fa fa-plus-circle'></i>Response 1</li>" +
-            "<ul  class='fa-ul'><li>Response 1.1</li><li>Response 1.2</li><li>Response 1.3</li></ul>" +
+        str += "<ul class='fa-ul'><li><i  class='fa-li fa fa-plus-circle'></i>Response 1</li>" +
+            "<ul class='fa-ul'><li>Response 1.1</li><li>Response 1.2</li></ul>" +
             "<li>Response 2</li></ul>";
     });
     str += "</ul>";
@@ -51,6 +51,22 @@ $( document ).ready(function() {
 var register = function() {
     $('UL LI').click(function(){
         if($(this).next().is("ul")) {
+            $(this).next().slideToggle();
+        }
+    });
+};
+
+var collapseAll = function() {
+    $('UL LI').each(function(){
+        if($(this).next().is("ul") && !$(this).next().is(":hidden")) {
+            $(this).next().slideToggle();
+        }
+    });
+};
+
+var openAll = function() {
+    $('UL LI').each(function(){
+        if($(this).next().is("ul") && $(this).next().is(":hidden")) {
             $(this).next().slideToggle();
         }
     });
