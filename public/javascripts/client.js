@@ -20,9 +20,23 @@ socket.on('message', function (data) {
 
 socket.on('history', function (data) {
 //    console.log(data);
-    data.forEach(function(entry) {
-        $('#message').append('<li id=' + entry._id +'><i  class="fa-li"></i>' + entry.name + ": " + entry.message + '</li>');
-    });
+    var unused = data;
+    do {
+//        console.log(unused);
+        var newUnused = {};
+        unused.forEach(function (entry) {
+            if (entry.parent != null && entry.parent != "") {
+                if ($("#" + entry.parent) != null)
+                    addChild(entry.parent, entry._id, entry.name + ": " + entry.message);
+                else
+                    newUnused.append(entry);
+            } else {
+                $("#message").append('<li id="' + entry._id +'"><i  class="fa-li"></i>' + entry.name + ": " + entry.message + '</li>');
+            }
+            unused = newUnused;
+//            $('#message').append('<li id=' + entry._id + '><i  class="fa-li"></i>' + entry.name + ": " + entry.message + '</li>');
+        });
+    } while (unused.length > 0);
     register();
 });
 
@@ -64,7 +78,7 @@ var register = function() {
 };
 
 var addChild = function(id, messageid, message) {
-    console.log(message);
+//    console.log(message);
 
     var elem = $("#" + id);
 
