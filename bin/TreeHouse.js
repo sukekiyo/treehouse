@@ -4,7 +4,8 @@
 var app = require('../app');
 var mongoose = require('mongoose');
 var msg = require('../domain/Message');
-mongoose.connect('mongodb://localhost/test');
+//mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://admin:password@ds035290.mongolab.com:35290/treehouse');
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
