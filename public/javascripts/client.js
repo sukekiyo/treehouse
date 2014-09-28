@@ -66,6 +66,13 @@ $( document ).ready(function() {
 });
 
 var register = function() {
+    $('body').unbind().click( function (e) {
+        if ( e.target == this ) {
+            $("#response").html("");
+            responseID = "";
+        }
+    });
+
     $('UL LI').unbind().click(function(){
         if($(this).next().is("ul")) {
             $(this).next().slideToggle();
