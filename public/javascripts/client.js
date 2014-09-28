@@ -4,30 +4,33 @@
 
 var socket = io.connect();
 var name = "";
+var responseID = "";
 
 // if we get an "info" emit from the socket server then console.log the data we recive
 socket.on('message', function (data) {
-//    console.log(data);
-    $('#message').append('<p>' + data.msg + '</p>');
+//    console.log("Parent: " + data.parentID);
+    if (data.parentID != null && data.parentID != "") {
+        addChild(data.parentID, data.msgID, data.msg);
+    } else {
+//        console.log("Random");
+        $("#message").append('<li id="' + data.msgID +'"><i  class="fa-li"></i>' + data.msg + '</li>');
+        register();
+    }
 });
 
 socket.on('history', function (data) {
-    var str = "<ul class='fa-ul'>";
+//    console.log(data);
     data.forEach(function(entry) {
-        str += '<li><i  class="fa-li fa fa-plus-circle"></i>' + entry.name + ": " + entry.message + '</li>';
-        str += "<ul class='fa-ul'><li><i  class='fa-li fa fa-plus-circle'></i>Response 1</li>" +
-            "<ul class='fa-ul'><li>Response 1.1</li><li>Response 1.2</li></ul>" +
-            "<li>Response 2</li></ul>";
+        $('#message').append('<li id=' + entry._id +'><i  class="fa-li"></i>' + entry.name + ": " + entry.message + '</li>');
     });
-    str += "</ul>";
-    $('#message').append(str);
     register();
 });
 
 var sendMessage = function() {
     var msg = $('#msg');
 //    console.log(msg);
-    socket.emit('client', {c_msg: msg.val(), user: name});
+    socket.emit('client', {c_msg: msg.val(), user: name, parent: responseID});
+
     msg.val("");
 };
 
@@ -49,12 +52,35 @@ $( document ).ready(function() {
 });
 
 var register = function() {
-    $('UL LI').click(function(){
+    $('UL LI').unbind().click(function(){
         if($(this).next().is("ul")) {
             $(this).next().slideToggle();
         }
+    }).click(function() {
+        $("#response").html($(this).html());
+        responseID = $(this).attr('id');
+//        console.log(responseID);
     });
 };
+
+var addChild = function(id, messageid, message) {
+    console.log(message);
+
+    var elem = $("#" + id);
+
+    if (elem.next().is("ul")) { // add to the end of the previous list
+        elem.next().append("<li id='"+ messageid + "'><i  class='fa-li'></i>" + message + "</li>");
+    } else { //create a new sublist
+        var str = "<ul class='fa-ul'>" +
+            "<li id='" + messageid + "'><i  class='fa-li'></i>" + message + "</li>" +
+            "</ul>";
+        elem.addClass("fa").addClass("fa-plus-circle");
+        elem.after(str);
+    }
+
+    register();
+};
+
 
 var collapseAll = function() {
     $('UL LI').each(function(){

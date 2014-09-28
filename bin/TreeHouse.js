@@ -3,6 +3,7 @@
  */
 var app = require('../app');
 var mongoose = require('mongoose');
+var msg = require('../domain/Message');
 mongoose.connect('mongodb://localhost/test');
 
 var db = mongoose.connection;
@@ -12,27 +13,19 @@ var server = app.listen(3000);
 var io = require('socket.io').listen(server);
 console.log("Express server listening on port 3000");
 
-// Creating schema for message storage
-var messageSchema = mongoose.Schema({
-    name: String,
-    message: String
-});
-
-var Message = mongoose.model('Message', messageSchema);
-
 // Connection for socket.io
 io.sockets.on('connection', function (socket) {
 //    console.log('A new user connected!');
 
     socket.on('client', function(data){
 //        console.log(data.c_msg);
-        saveMessage(data.user, data.c_msg);
+        var id = saveMessage(data.user, data.c_msg, data.parent);
         var results = data.user + ": " + data.c_msg;
-        io.emit('message', { msg: results });
+        io.emit('message', { msg: results, msgID: id, parentID: data.parent});
     });
 
     socket.on('action', function(data){
-        Message.find(function (err, messages) {
+        msg.Message.find(function (err, messages) {
             if (err) return console.error(err);
 //            console.log(messages);
             socket.emit('history', messages);
@@ -40,18 +33,12 @@ io.sockets.on('connection', function (socket) {
     });
 });
 
-var saveMessage = function(name, message) {
+var saveMessage = function(name, message, parentID) {
     console.log("Saving Message");
-    var msg = new Message({name: name, message: message});
-    msg.save(function (err, msg) {
+    var newMsg = new msg.Message({name: name, message: message, parent: parentID});
+    newMsg.save(function (err, msg) {
         if (err) return console.error(err);
 //        console.log(msg.name + " " + msg.message);
     });
-};
-
-var findAllMessage = function() {
-    Message.find(function (err, messages) {
-        if (err) return console.error(err);
-        return messages;
-    });
+    return newMsg.id;
 };
