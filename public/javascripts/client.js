@@ -6,7 +6,7 @@ var socket = io.connect();
 var name = "";
 var responseID = "";
 
-// if we get an "info" emit from the socket server then console.log the data we recive
+// if we get an "message" emit from the socket server then console.log the data we receive
 socket.on('message', function (data) {
 //    console.log("Parent: " + data.parentID);
     if (data.parentID != null && data.parentID != "") {
@@ -18,6 +18,7 @@ socket.on('message', function (data) {
     }
 });
 
+// we use the "history" emit to display past results
 socket.on('history', function (data) {
 //    console.log(data);
     var unused = data;
@@ -34,7 +35,6 @@ socket.on('history', function (data) {
                 $("#message").append('<li id="' + entry._id +'"><i  class="fa-li"></i>' + entry.name + ": " + entry.message + '</li>');
             }
             unused = newUnused;
-//            $('#message').append('<li id=' + entry._id + '><i  class="fa-li"></i>' + entry.name + ": " + entry.message + '</li>');
         });
     } while (unused.length > 0);
     register();
@@ -66,7 +66,7 @@ $( document ).ready(function() {
 
 var login = function() {
     name = $.cookie('currentUser');
-    console.log(name);
+//    console.log(name);
     while (name == 'undefined') {
         name = prompt("Please enter your name:");
     }
@@ -103,7 +103,6 @@ var register = function() {
 
 var addChild = function(id, messageid, message) {
 //    console.log(message);
-
     var elem = $("#" + id);
 
     if (elem.next().is("ul")) { // add to the end of the previous list
@@ -118,7 +117,6 @@ var addChild = function(id, messageid, message) {
 
     register();
 };
-
 
 var collapseAll = function() {
     $('UL LI').each(function(){
