@@ -10,7 +10,7 @@ mongoose.connect('mongodb://admin:password@ds035290.mongolab.com:35290/treehouse
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
-var server = app.listen(3000);
+var server = app.listen(process.env.PORT || 3000);
 var io = require('socket.io').listen(server);
 console.log("Express server listening on port 3000");
 
