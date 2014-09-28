@@ -54,8 +54,7 @@ var displayOldMessages = function() {
 };
 
 $( document ).ready(function() {
-    name = prompt("Please enter your name:");
-    $('#cur_user').html("Welcome, " + name);
+    login();
     $('#msg').on("keypress", function(e) {
         if (e.keyCode == 13) {
             sendMessage();
@@ -64,6 +63,24 @@ $( document ).ready(function() {
 
     displayOldMessages();
 });
+
+var login = function() {
+    name = $.cookie('currentUser');
+    console.log(name);
+    while (name == 'undefined') {
+        name = prompt("Please enter your name:");
+    }
+    $.cookie('currentUser', name, {path: '/'});
+    $('#cur_user').html("Welcome, " + name);
+};
+
+var changeUser = function() {
+    do {
+        name = prompt("Please enter new name:");
+    } while (name == "undefined" || name.length == 0);
+    $.cookie('currentUser', name, {path: '/'});
+    $('#cur_user').html("Welcome, " + name);
+};
 
 var register = function() {
     $('body').unbind().click( function (e) {
