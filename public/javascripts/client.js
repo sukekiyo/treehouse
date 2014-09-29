@@ -5,6 +5,9 @@
 var socket = io.connect();
 var name = "";
 var responseID = "";
+var respondIcon = "&#09;<i class='fa fa-mail-reply response'></i>";
+var PLUS = "fa-plus";
+var MINUS = "fa-minus";
 
 // if we get an "message" emit from the socket server then console.log the data we receive
 socket.on('message', function (data) {
@@ -13,7 +16,7 @@ socket.on('message', function (data) {
         addChild(data.parentID, data.msgID, data.msg);
     } else {
 //        console.log("Random");
-        $("#message").append('<li id="' + data.msgID +'"><i  class="fa-li"></i>' + data.msg + '</li>');
+        $("#message").append('<li id="' + data.msgID +'">' + data.msg + respondIcon + '</li>');
         register();
     }
 });
@@ -32,12 +35,13 @@ socket.on('history', function (data) {
                 else
                     newUnused.append(entry);
             } else {
-                $("#message").append('<li id="' + entry._id +'"><i  class="fa-li"></i>' + entry.name + ": " + entry.message + '</li>');
+                $("#message").append('<li id="' + entry._id +'">' + entry.name + ": " + entry.message + respondIcon + '</li>');
             }
             unused = newUnused;
         });
     } while (unused.length > 0);
     register();
+    collapseAll();
 });
 
 var sendMessage = function() {
@@ -90,14 +94,25 @@ var register = function() {
         }
     });
 
-    $('UL LI').unbind().click(function(){
-        if($(this).next().is("ul")) {
-            $(this).next().slideToggle();
+//    $('UL LI').unbind().click(function(){
+    $('.expandable').unbind().click(function(){
+        var ele = $(this).parent().next();
+        if(ele.is("ul")) {
+            if (ele.is(":hidden")) {
+                $(this).removeClass(PLUS).addClass(MINUS);
+            } else {
+                $(this).removeClass(MINUS).addClass(PLUS);
+            }
+            ele.slideToggle();
         }
-    }).click(function() {
-        $("#response").html($(this).html());
-        responseID = $(this).attr('id');
+    });
+
+    $('.response').unbind().click(function() {
+//        console.log($(this).parent());
+        $("#response").html($(this).parent().html());
+        responseID = $(this).parent().attr('id');
 //        console.log(responseID);
+        $('#response').children().remove();
     });
 };
 
@@ -106,12 +121,12 @@ var addChild = function(id, messageid, message) {
     var elem = $("#" + id);
 
     if (elem.next().is("ul")) { // add to the end of the previous list
-        elem.next().append("<li id='"+ messageid + "'><i  class='fa-li'></i>" + message + "</li>");
+        elem.next().append("<li id='"+ messageid + "'>" + message  + respondIcon + "</li>");
     } else { //create a new sublist
         var str = "<ul class='fa-ul'>" +
-            "<li id='" + messageid + "'><i  class='fa-li'></i>" + message + "</li>" +
+            "<li id='" + messageid + "'>" + message  + respondIcon + "</li>" +
             "</ul>";
-        elem.addClass("fa").addClass("fa-plus-circle");
+        elem.prepend('<i class="fa ' + PLUS +' fa-fw expandable"></i>');
         elem.after(str);
     }
 
@@ -124,12 +139,15 @@ var collapseAll = function() {
             $(this).next().slideToggle();
         }
     });
+    $('.expandable').removeClass(MINUS).addClass(PLUS);
 };
 
 var openAll = function() {
     $('UL LI').each(function(){
         if($(this).next().is("ul") && $(this).next().is(":hidden")) {
+//            $(this).removeClass(PLUS).addClass(MINUS);
             $(this).next().slideToggle();
         }
     });
+    $('.expandable').removeClass(PLUS).addClass(MINUS);
 };
