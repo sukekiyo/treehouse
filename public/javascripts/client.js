@@ -6,6 +6,7 @@ var socket = io.connect();
 var name = "";
 var responseID = "";
 var respondIcon = "&#09;<i class='fa fa-mail-reply response'></i>";
+var invisIcon = "<i class='fa expandable fa-fw invisible'></i>";
 var PLUS = "fa-plus";
 var MINUS = "fa-minus";
 
@@ -16,7 +17,7 @@ socket.on('message', function (data) {
         addChild(data.parentID, data.msgID, data.msg);
     } else {
 //        console.log("Random");
-        $("#message").append('<li id="' + data.msgID +'">' + data.msg + respondIcon + '</li>');
+        $("#message").append('<li id="' + data.msgID +'">'+ invisIcon + data.msg + respondIcon + '</li>');
         register();
     }
 });
@@ -35,7 +36,7 @@ socket.on('history', function (data) {
                 else
                     newUnused.append(entry);
             } else {
-                $("#message").append('<li id="' + entry._id +'">' + entry.name + ": " + entry.message + respondIcon + '</li>');
+                $("#message").append('<li id="' + entry._id +'">' + invisIcon + entry.name + ": " + entry.message + respondIcon + '</li>');
             }
             unused = newUnused;
         });
@@ -47,9 +48,16 @@ socket.on('history', function (data) {
 var sendMessage = function() {
     var msg = $('#msg');
 //    console.log(msg);
-    socket.emit('client', {c_msg: msg.val(), user: name, parent: responseID});
+    socket.emit('client', {c_msg: msg.val(), user: name, parent: ""});
 
     msg.val("");
+    removeResponse();
+};
+
+var sendResponse = function() {
+    var msg = $('#ResponseMessage');
+    socket.emit('client', {c_msg: msg.val(), user: name, parent: responseID});
+    removeResponse();
 };
 
 var displayOldMessages = function() {
@@ -89,7 +97,6 @@ var changeUser = function() {
 var register = function() {
     $('body').unbind().click( function (e) {
         if ( e.target == this ) {
-            $("#response").html("");
             responseID = "";
         }
     });
@@ -109,24 +116,53 @@ var register = function() {
 
     $('.response').unbind().click(function() {
 //        console.log($(this).parent());
-        $("#response").html($(this).parent().html());
-        responseID = $(this).parent().attr('id');
-//        console.log(responseID);
-        $('#response').children().remove();
+        var ele = $(this).parent(); //get the li
+
+        if (ele.next().is("#ResponseInput")) {
+            removeResponse();
+        } else {
+            responseID = $(this).parent().attr('id');
+
+            // remove previous ResponseInputs
+            $("#ResponseInput").remove();
+
+            // add the input
+            ele.after('<li id="ResponseInput"><label for="ResponseMessage"><i class="fa fa-arrow-right"></i></label>' +
+                '<input type="text" id="ResponseMessage">' +
+                '<button id="ResponseButton">Submit</button></li>');
+
+            // register enter keydown
+            $('#ResponseMessage').on("keypress", function(e) {
+                if (e.keyCode == 13) {
+                    sendResponse();
+                }
+            });
+
+            $('#ResponseButton').click(function() {
+                sendResponse();
+            });
+        }
     });
+};
+
+var removeResponse = function() {
+    $("#ResponseInput").remove();
+    responseID = "";
 };
 
 var addChild = function(id, messageid, message) {
 //    console.log(message);
     var elem = $("#" + id);
 
-    if (elem.next().is("ul")) { // add to the end of the previous list
-        elem.next().append("<li id='"+ messageid + "'>" + message  + respondIcon + "</li>");
-    } else { //create a new sublist
+    if (elem.next().is("ul")) {
+        // add to the end of the previous list
+        elem.next().append("<li id='"+ messageid + "'>"+ invisIcon + message  + respondIcon + "</li>");
+    } else {
+        //create a new sublist
         var str = "<ul class='fa-ul'>" +
-            "<li id='" + messageid + "'>" + message  + respondIcon + "</li>" +
+            "<li id='" + messageid + "'>"+ invisIcon + message  + respondIcon + "</li>" +
             "</ul>";
-        elem.prepend('<i class="fa ' + PLUS +' fa-fw expandable"></i>');
+        $("#" + id + " > .expandable").removeClass("invisible").addClass(MINUS);
         elem.after(str);
     }
 
@@ -134,6 +170,7 @@ var addChild = function(id, messageid, message) {
 };
 
 var collapseAll = function() {
+    removeResponse();
     $('UL LI').each(function(){
         if($(this).next().is("ul") && !$(this).next().is(":hidden")) {
             $(this).next().slideToggle();
@@ -143,6 +180,7 @@ var collapseAll = function() {
 };
 
 var openAll = function() {
+    removeResponse();
     $('UL LI').each(function(){
         if($(this).next().is("ul") && $(this).next().is(":hidden")) {
 //            $(this).removeClass(PLUS).addClass(MINUS);
