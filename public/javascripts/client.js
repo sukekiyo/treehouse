@@ -74,6 +74,7 @@ $( document ).ready(function() {
     });
 
     displayOldMessages();
+    $("#msg").focus();
 });
 
 var login = function() {
@@ -141,6 +142,8 @@ var register = function() {
             $('#ResponseButton').click(function() {
                 sendResponse();
             });
+
+            $('#ResponseMessage').focus();
         }
     });
 };
